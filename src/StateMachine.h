@@ -49,7 +49,9 @@ public:
 
     void run() {
         while (true) {
-            state = state->run();
+            State* new_state = state->run();
+            delete state; // Manual memory management (my favourite)
+            state = new_state;
         }
     }
 
