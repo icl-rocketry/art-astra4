@@ -2,6 +2,15 @@
 
 #include "Device.h"
 
+// I'm not an expert in colours so these *might* be wrong
+#define RED 0xFF0000
+#define GREEN 0x00FF00
+#define BLUE 0x0000FF
+#define YELLOW 0xFFFF00
+#define CYAN 0x00FFFF
+#define MAGENTA 0xFF00FF
+#define WHITE 0xFFFFFF
+
 class State {
 public:
     State(Device& device, uint32_t colour) : device(device), 
@@ -19,41 +28,65 @@ protected:
     uint32_t colour;
 };
 
-class RedState : public State {
+class Diagnostic : public State {
 public:
-    RedState(Device& device) : State(device, 0xff0000) {}
+    Diagnostic(Device& device) : State(device, BLUE) {}
 
 protected:
-    State* run_() override;
+    State* run_();
 };
 
-class GreenState : public State {
+class Preflight : public State {
 public:
-    GreenState(Device& device) : State(device, 0x00ff00) {}
+    Preflight(Device& device) : State(device, GREEN) {}
 
 protected:
-    State* run_() override;
-
+    State* run_();
 };
-class BlueState : public State {
+
+class FlightPreApogee : public State {
 public:
-    BlueState(Device& device) : State(device, 0x0000ff) {}
+    FlightPreApogee(Device& device) : State(device, WHITE) {}
 
 protected:
-    State* run_() override;
+    State* run_();
 };
+
+class Separation : public State {
+public:
+    Separation(Device& device) : State(device, MAGENTA) {}
+
+protected:
+    State* run_();
+};
+
+class PostFlight : public State {
+public:
+    PostFlight(Device& device) : State(device, CYAN) {}
+
+protected:
+    State* run_();
+};
+
+
+class Error : public State {
+public:
+    Error(const std::string msg, Device& device) : State(device, RED), msg(msg) {}
+
+protected:
+    State* run_();
+
+private:
+    std::string msg;
+};
+
+
 
 class StateMachine {
 public:
     StateMachine(Device& device, State* initial) : device(device), state(initial) {}
 
-    void run() {
-        while (true) {
-            State* new_state = state->run();
-            delete state; // Manual memory management (my favourite)
-            state = new_state;
-        }
-    }
+    void run();
 
 private:
     Device& device;

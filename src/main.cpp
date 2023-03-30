@@ -3,7 +3,7 @@
 #include <StateMachine.h>
 
 Device device;
-StateMachine sm(device, new RedState(device));
+StateMachine sm(device, new Diagnostic(device));
 
 void setup() {}
 
