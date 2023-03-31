@@ -18,6 +18,7 @@ public:
         pixel.show();
     }
 
+    uint32_t start_time;
     USBCDC serial;
     GroundStation ground_station;
     

@@ -13,10 +13,14 @@ bool GroundStation::connect_to_wifi() {
     WiFi.begin(SSID, PASSWORD);
     
     int i = 0;
-    while (WiFi.status() != WL_CONNECTED && i < MAX_CONNECTION_RETRIES) {
+    while (WiFi.status() != WL_CONNECTED) {
         delay(500);
         Serial.print(".");
         i++;
+
+        if (i >= MAX_CONNECTION_RETRIES) {
+            return false;
+        }
     }
     
     // Can access this board @ "http://separation.local/"
@@ -37,6 +41,7 @@ bool GroundStation::connect_to_wifi() {
 
     server_.begin();
     Serial.println("Server started");
+    return true;
 }
 
 void GroundStation::run() {

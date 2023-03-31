@@ -20,7 +20,7 @@ State* Preflight::run_() {
     }
     device.ground_station.run();
     device.ground_station.kill();
-    // TODO: set the flight start time to now
+    device.start_time = millis();
     return new FlightPreApogee(device);
 }
 
