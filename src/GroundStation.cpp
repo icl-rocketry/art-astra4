@@ -3,21 +3,24 @@
 
 #define SSID "ASTRA4"
 #define PASSWORD "password" // We love security
+#define MAX_CONNECTION_RETRIES 100
 
-void GroundStation::connect_to_wifi() {
+bool GroundStation::connect_to_wifi() {
     Serial.print("Connecting to ");
     Serial.println(SSID);
     
     WiFi.mode(WIFI_STA);
     WiFi.begin(SSID, PASSWORD);
     
-    while (WiFi.status() != WL_CONNECTED) {
+    int i = 0;
+    while (WiFi.status() != WL_CONNECTED && i < MAX_CONNECTION_RETRIES) {
         delay(500);
         Serial.print(".");
+        i++;
     }
     
-    // This was in the tutorial - no clue what it does (https://archive.ph/OQl4H)
-    if (MDNS.begin("esp32")) {
+    // Can access this board @ "http://separation.local/"
+    if (MDNS.begin("separation")) {
         Serial.println("MDNS responder started");
     }
 

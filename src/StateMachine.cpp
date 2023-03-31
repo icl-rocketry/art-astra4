@@ -15,7 +15,12 @@ State* Diagnostic::run_() {
 }
 
 State* Preflight::run_() {
-    // TODO: Fill this out
+    if (!device.ground_station.connect_to_wifi()) {
+        return new Error("Couldn't connect to wifi", device);
+    }
+    device.ground_station.run();
+    device.ground_station.kill();
+    // TODO: set the flight start time to now
     return new FlightPreApogee(device);
 }
 

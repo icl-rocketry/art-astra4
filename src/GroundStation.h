@@ -9,12 +9,8 @@
 class GroundStation {
 public:
     GroundStation() : server_(80), done(false) {}
-    ~GroundStation() {
-        kill();
-    }
 
-
-    void connect_to_wifi();
+    bool connect_to_wifi();
     void run();
     void kill();
 

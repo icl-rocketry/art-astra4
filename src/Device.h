@@ -2,6 +2,7 @@
 
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
+#include "GroundStation.h"
 
 // This struct contains anything that 
 class Device {
@@ -18,6 +19,7 @@ public:
     }
 
     USBCDC serial;
+    GroundStation ground_station;
     
 private:
     Adafruit_NeoPixel pixel;
