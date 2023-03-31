@@ -1,0 +1,34 @@
+apogeeguess1 = xyz.
+apogeeguess2 = xyz2.
+from origin. 
+record time and pressure. 
+turn pressure into altitude. - start alldata array 
+
+for each new datapoint collected. 
+1. put into alldata array. 
+2. check if altitude > 10
+	if yes - define time here as initlaunchtime. 
+	create an array from initlaunchtime till present time - called Launchdata. 
+	
+		3. (CHECKING IF MAX THRUST ALTITUDE HAS BEEN REACHED)
+		if altitude >220. 
+			record time here is MTAT (max thrust altitude time)
+				
+				while apogeeguess2 - apogeeguess1 > VALUE. 
+				apogeeguess2 = apogeeguess1
+				4. start a for loop from MTAT to end.
+				put all data from here into new array called Analysetime and Analysepressure.
+				Put in the matrix to calculate the quadratic coefficients, alpha, beta, gamma. 
+			
+
+				MATHS PART:
+				1. Calculate the differentiation. 
+				2. Let it equal to 0 + calculate a value of t. 
+				3. Put t back into the main equation to find an altitude guess. 	
+				4. apogeeguess2 = altitudeguess.
+				
+
+		5. Display final apogee value. 
+		if current altitude - apogeeguess2 < value2. 
+		stop recording data into launch data and say tha apogee has been reached.
+
