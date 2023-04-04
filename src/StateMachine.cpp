@@ -30,7 +30,11 @@ State* FlightPreApogee::run_() {
 }
 
 State* Separation::run_() {
-    // TODO: Fill this out
+    device.start_servo_forward();
+    delay(5000);
+    device.start_servo_backward();
+    delay(5000);
+    device.stop_servo();
     return new PostFlight(device);
 }
 
