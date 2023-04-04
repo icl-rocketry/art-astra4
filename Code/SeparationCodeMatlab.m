@@ -7,11 +7,11 @@ data = readmatrix("astra2_full_testdata.txt");
 availabledata = []; % empty array of all data - will be filled up later on.
 launchData = []; % the first value of this array is defined as the initlaunchtime. 
 
-% check correct import of data
-figure
-plot(data(:, 1)-data(1,1), data(:, 2))
-figure
-plot(data(:, 1)-data(1,1), atmospalt(data(:, 2)))
+% % check correct import of data
+% figure
+% plot(data(:, 1)-data(1,1), data(:, 2))
+% figure
+% plot(data(:, 1)-data(1,1), atmospalt(data(:, 2)))
 
 
 % Variables
@@ -35,11 +35,12 @@ set(af, 'Position', [0 0 2560 1440]);
 plot(-10, 0, 'kx', 'LineWidth', lw, 'MarkerSize', ms)
 plot(-10, 0, 'gx', 'LineWidth', lw, 'MarkerSize', ms)
 plot(-10, 0, 'r-', 'LineWidth', lw, 'MarkerSize', ms)
-xlim([0 (max(data(:, 1)-data(1,1))/1000)+5])
+xlim([200 400])
 ylim([min(atmospalt(data(:, 2)))-10, 600])
-legend('Prelaunch', 'Launch Detected', 'Predicted Trajectory','AutoUpdate','off')
+legend('Prelaunch', 'Launch Detected', 'Predicted Trajectory','AutoUpdate','off', 'FontSize', fs)
+caption = text(200, 550, sprintf('Launch not detected, t = 0'));
 
-for i = 1: length(data) % Taking in data point by point - to mimic the pressure readings. 
+for i = 5000:6000 % Taking in data point by point - to mimic the pressure readings. 
     availabledata(i,1) = data(i,1); % Adding each time datapoint onto the end of all data array. 
     availabledata(i,2) = data(i,2); % pressure point.
     availabledata(i,3) = 44330 * ( 1 - (availabledata(i,2)/refpressure)^(1/5.255)); % calculating the altitude at each pressure point. 
@@ -85,9 +86,13 @@ for i = 1: length(data) % Taking in data point by point - to mimic the pressure 
                 fprintf('Apogee detected at t = %.1f, alt = %.1f, v = %.2f\n', Ts(end)/1000, As(end), vel)
             end
         end
+        plot(availabledata(1:min(val), 1)/1000, availabledata(1:min(val), 3), 'kx', 'LineWidth', lw, 'MarkerSize', ms)
+        plot(availabledata(min(val):end, 1)/1000, availabledata(min(val):end, 3), 'gx', 'LineWidth', lw, 'MarkerSize', ms)
+        caption = text(275, 550, sprintf('Launch detected, t = %.2f', availabledata(end, 1)/1000), 'FontSize', fs);
+
     else
         plot(availabledata(:, 1)/1000, availabledata(:, 3), 'kx', 'LineWidth', lw, 'MarkerSize', ms)
-        caption = text(200, 550, sprintf('Launch not detected, t = %.2f', availabledata(end, 1)/1000));
+        caption = text(275, 550, sprintf('Launch not detected, t = %.2f', availabledata(end, 1)/1000), 'FontSize', fs);
     end
 
     drawnow
