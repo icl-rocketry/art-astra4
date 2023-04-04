@@ -42,29 +42,32 @@ for i = 1: length(data) % Taking in data point by point - to mimic the pressure 
                 continue
             end
 
-            while (ag2 - ag1) > 10
-                ag1 = ag2 ;
-                Ts = launchData(MTI:end,1) - launchData(1,1);
-                As = launchData(MTI:end,2);
+
+            Ts = launchData(MTI:end,1) - launchData(1,1);
+            As = launchData(MTI:end,2);
                
-                % Matrix multiplication. 
-%                 y = ([sum(Ts.^4), sum(Ts.^3), sum(Ts.^2); sum(Ts.^3), sum(Ts.^2), sum(Ts.^1); sum(Ts.^2), sum(Ts), 1]);
-%                 z = [sum(As.*(Ts.^3)); sum(As.*(Ts.^2)); sum(As.*Ts)];                
-%                 result = (y.^-1) * z;
+            y = ([sum(Ts.^4), sum(Ts.^3), sum(Ts.^2); sum(Ts.^3), sum(Ts.^2), sum(Ts.^1); sum(Ts.^2), sum(Ts), length(Ts)]);
+            z = [sum(As.*(Ts.^2)); sum(As.*(Ts.^1)); sum(As)];                
+            coeffs = y\z;
+            velcoeffs = [2*coeffs(1); coeffs(2)];
+            
+            if As(end) == As(end-1)
+                continue
+            end
+            
+            ag1 = ag2;
+            tguess = -velcoeffs(2)/velcoeffs(1);
+            ag2 = coeffs(1)*tguess^2 + coeffs(2)*tguess + coeffs(3);
 
-                y = ([1, sum(Ts), sum(Ts.^2); sum(Ts.^1), sum(Ts.^2), sum(Ts.^3); sum(Ts.^2), sum(Ts.^3), sum(Ts.^4)]);
-                z = [sum(As.*(Ts.^1)); sum(As.*(Ts.^2)); sum(As.*(Ts.^3))];
-                %z = [sum(As); sum(As.*(Ts)); sum(As.*Ts.^2)];                
-                result = (y.^-1) * z;
-
-                diff = polyder(result);
-                tguess = -diff(2)/(diff(1));
-                ag2 = polyval(result,tguess);
-            end 
+            
+            if ag2 - ag1 < 1 && launchData(end, 2) <= ag2
+                vel = velcoeffs(1)*Ts(end) + velcoeffs(2);
+                sprintf('Apogee detected at t = %.1f, alt = %.1f, v = %.2f', Ts(end)/1000, As(end), vel)
+            end
         end 
-
-    end
+    end   
 end
+
 
     
 
