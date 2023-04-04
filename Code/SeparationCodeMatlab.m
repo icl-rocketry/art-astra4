@@ -76,6 +76,8 @@ for i = 5000:6000 % Taking in data point by point - to mimic the pressure readin
             MTAT = launchData(MTI,1);
 
             if length(launchData(MTI:end,1)) < 3
+                drawnow
+                writeVideo(v, getframe(af));
                 continue
             end
 
@@ -88,9 +90,6 @@ for i = 5000:6000 % Taking in data point by point - to mimic the pressure readin
             coeffs = y\z;
             velcoeffs = [2*coeffs(1); coeffs(2)];
             
-            if As(end) == As(end-1)
-                continue
-            end
             
             ag1 = ag2;
             tguess = -velcoeffs(2)/velcoeffs(1);
@@ -105,14 +104,16 @@ for i = 5000:6000 % Taking in data point by point - to mimic the pressure readin
             end
             trajpred = plot((anim_xs + launchData(1,1))/1000, anim_ys, '-', 'LineWidth', lw, 'MarkerSize', ms, 'Color', cols(3));
 %             predap = text(300, 300, sprintf('Current Apogee prediction %.1f m at t = %.2f', ag2, tguess/1000), 'FontSize', fs);
-            if ag2 - ag1 < 1 && launchData(end, 2) <= ag2 && launchData(end, 1) > tguess
-                vel = velcoeffs(1)*Ts(end) + velcoeffs(2);
-                fprintf('Apogee detected at t = %.1f, alt = %.1f, v = %.2f\n', Ts(end)/1000, ag2, vel)                
-                if ~exist('apogeeflag')
-                    plot((anim_xs + launchData(1,1))/1000, anim_ys, '-', 'LineWidth', lw, 'MarkerSize', ms, 'Color', cols(4));
-                    xline(tguess/1000, 'k--', 'LineWidth', lw);
-                    yline(ag2, 'k--', 'LineWidth', lw);
-                    apogeeflag = text(240, 260, sprintf('Seperation Triggered at alt = %.1f t = %.2f', ag2, Ts(end)/1000), 'FontSize', fs);
+            if As(end) ~= As(end-1)
+                if ag2 - ag1 < 1 && launchData(end, 2) <= ag2 && launchData(end, 1) > tguess
+                    vel = velcoeffs(1)*Ts(end) + velcoeffs(2);
+                    fprintf('Apogee detected at t = %.1f, alt = %.1f, v = %.2f\n', Ts(end)/1000, ag2, vel)                
+                    if ~exist('apogeeflag')
+                        plot((anim_xs + launchData(1,1))/1000, anim_ys, '-', 'LineWidth', lw, 'MarkerSize', ms, 'Color', cols(4));
+                        xline((tguess + launchData(1,1))/1000, 'k--', 'LineWidth', lw);
+                        yline(ag2, 'k--', 'LineWidth', lw);
+                        apogeeflag = text(310, 450, sprintf('Seperation Triggered at alt = %.1f t = %.2f', ag2, (tguess+launchData(1,1))/1000), 'FontSize', fs);
+                    end
                 end
             end
         end
