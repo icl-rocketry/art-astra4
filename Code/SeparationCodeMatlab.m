@@ -4,7 +4,7 @@ clear
 
 % Importing data into an array 
 data = readmatrix("astra2_full_testdata.txt");
-alldata = []; % empty array of all data - will be filled up later on.
+availabledata = []; % empty array of all data - will be filled up later on.
 launchData = []; % the first value of this array is defined as the initlaunchtime. 
 
 % check correct import of data
@@ -21,20 +21,39 @@ ag1 = 300; % Apogee guess 1.
 ag2 = 350; % Apogee guess 2. 
 min_triggeralt = 10;
 
+tic
+% frame rate of animation
+% recommended to keep at 24 - any lower and it doesn't look smooth, higher
+% looks smoother but takes longer to process
+fr = 24;
+fs = 20;
+lw = 2;
+ms = 20;
+af = figure;
+hold on
+set(af, 'Position', [0 0 2560 1440]);
+plot(-10, 0, 'kx', 'LineWidth', lw, 'MarkerSize', ms)
+plot(-10, 0, 'gx', 'LineWidth', lw, 'MarkerSize', ms)
+plot(-10, 0, 'r-', 'LineWidth', lw, 'MarkerSize', ms)
+xlim([0 (max(data(:, 1)-data(1,1))/1000)+5])
+ylim([min(atmospalt(data(:, 2)))-10, max(atmospalt(data(:, 2)))+10])
+legend('Prelaunch', 'Launch Detected', 'Predicted Trajectory')
+
 for i = 1: length(data) % Taking in data point by point - to mimic the pressure readings. 
-    alldata(i,1) = data(i,1); % Adding each time datapoint onto the end of all data array. 
-    alldata(i,2) = data(i,2); % pressure point.
-    alldata(i,3) = 44330 * ( 1 - (alldata(i,2)/refpressure)^(1/5.255)); % calculating the altitude at each pressure point. 
+    availabledata(i,1) = data(i,1); % Adding each time datapoint onto the end of all data array. 
+    availabledata(i,2) = data(i,2); % pressure point.
+    availabledata(i,3) = 44330 * ( 1 - (availabledata(i,2)/refpressure)^(1/5.255)); % calculating the altitude at each pressure point. 
     
     % checking if the altitude is above 10m. 
-    if alldata(i,3) > min_triggeralt
-        val = find(alldata(:,3)>min_triggeralt); % finding out at which points the altitude is more than 10m.
-        launchData = [launchData; alldata(val(end),1), alldata(val(end),3)];
+%     if availabledata(i,3) > min_triggeralt
+    val = find(availabledata(:,3)>min_triggeralt); % finding out at which points the altitude is more than 10m.
+    if ~isempty(val)
+        launchData = [launchData; availabledata(val(end),1), availabledata(val(end),3)];
         
         % checking if the max thrust altitude has been reached.
         % the time at which this happens is called MTAT.
         % Index for that time is called MTI.
-        if alldata(i,3) > maxthrustaltitude
+        if availabledata(i,3) > maxthrustaltitude
             MTI = find(launchData(:,2)>maxthrustaltitude,1);
             MTAT = launchData(MTI,1);
 
@@ -62,12 +81,25 @@ for i = 1: length(data) % Taking in data point by point - to mimic the pressure 
             
             if ag2 - ag1 < 1 && launchData(end, 2) <= ag2
                 vel = velcoeffs(1)*Ts(end) + velcoeffs(2);
-                sprintf('Apogee detected at t = %.1f, alt = %.1f, v = %.2f', Ts(end)/1000, As(end), vel)
+                fprintf('Apogee detected at t = %.1f, alt = %.1f, v = %.2f\n', Ts(end)/1000, As(end), vel)
             end
-        end 
-    end   
+        end
+    else
+        plot(availabledata(:, 1)/1000, availabledata(:, 3), 'kx', 'LineWidth', lw, 'MarkerSize', ms)
+
+    end
+
+    drawnow
 end
 
+function ys = coeffplot(xs, coeffs)
+
+    ys = zeros(length(xs), 1);
+    for i = length(coeffs):-1:1
+        ys = ys + coeffs(i).*(xs.^(i-1));
+    end
+
+end
 
     
 
