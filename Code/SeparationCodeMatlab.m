@@ -20,12 +20,13 @@ maxthrustaltitude = 220;
 ag1 = 300; % Apogee guess 1.
 ag2 = 350; % Apogee guess 2. 
 min_triggeralt = 10;
+flighttime = 45; % after motor burnout
 
 tic
 % frame rate of animation
 % recommended to keep at 24 - any lower and it doesn't look smooth, higher
 % looks smoother but takes longer to process
-fr = 24;
+fr = 20;
 fs = 20;
 lw = 2;
 ms = 20;
@@ -39,6 +40,10 @@ xlim([200 400])
 ylim([min(atmospalt(data(:, 2)))-10, 600])
 legend('Prelaunch', 'Launch Detected', 'Predicted Trajectory','AutoUpdate','off', 'FontSize', fs)
 caption = text(200, 550, sprintf('Launch not detected, t = 0'));
+
+v = VideoWriter('apogee_fit.mp4','MPEG-4');
+v.FrameRate = fr;
+v.Quality = 98;
 
 for i = 5000:6000 % Taking in data point by point - to mimic the pressure readings. 
     availabledata(i,1) = data(i,1); % Adding each time datapoint onto the end of all data array. 
@@ -79,20 +84,29 @@ for i = 5000:6000 % Taking in data point by point - to mimic the pressure readin
             ag1 = ag2;
             tguess = -velcoeffs(2)/velcoeffs(1);
             ag2 = coeffs(1)*tguess^2 + coeffs(2)*tguess + coeffs(3);
-
             
+            anim_xs = [min(Ts):0.05:min(Ts) + flighttime*1000]';
+            anim_ys = coeffplot(anim_xs, coeffs);
+            
+            if exist('trajpred')
+                delete(trajpred)
+                delete(predap)
+            end
+            trajpred = plot((anim_xs + launchData(1,1))/1000, anim_ys, 'r-', 'LineWidth', lw, 'MarkerSize', ms);
+            predap = text(340, 300, sprintf('Apogee prediction %.1f m at t = %.2f', ag2, tguess), 'FontSize', fs);
             if ag2 - ag1 < 1 && launchData(end, 2) <= ag2
                 vel = velcoeffs(1)*Ts(end) + velcoeffs(2);
                 fprintf('Apogee detected at t = %.1f, alt = %.1f, v = %.2f\n', Ts(end)/1000, As(end), vel)
+                apogeeflag = text(340, 450, 'Apogee Detected!');
             end
         end
         plot(availabledata(1:min(val), 1)/1000, availabledata(1:min(val), 3), 'kx', 'LineWidth', lw, 'MarkerSize', ms)
         plot(availabledata(min(val):end, 1)/1000, availabledata(min(val):end, 3), 'gx', 'LineWidth', lw, 'MarkerSize', ms)
-        caption = text(275, 550, sprintf('Launch detected, t = %.2f', availabledata(end, 1)/1000), 'FontSize', fs);
+        caption = text(240, 550, sprintf('Launch detected, t = %.2f', availabledata(end, 1)/1000), 'FontSize', fs);
 
     else
         plot(availabledata(:, 1)/1000, availabledata(:, 3), 'kx', 'LineWidth', lw, 'MarkerSize', ms)
-        caption = text(275, 550, sprintf('Launch not detected, t = %.2f', availabledata(end, 1)/1000), 'FontSize', fs);
+        caption = text(240, 550, sprintf('Launch not detected, t = %.2f', availabledata(end, 1)/1000), 'FontSize', fs);
     end
 
     drawnow
@@ -101,9 +115,8 @@ end
 function ys = coeffplot(xs, coeffs)
 
     ys = zeros(length(xs), 1);
-    for i = length(coeffs):-1:1
-        ys = ys + coeffs(i).*(xs.^(i-1));
-    end
+
+    ys = ys + coeffs(1).*(xs.^2) + coeffs(2).*xs + coeffs(3);
 
 end
 
