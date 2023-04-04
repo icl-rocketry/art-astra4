@@ -37,7 +37,11 @@ for i = 1: length(data) % Taking in data point by point - to mimic the pressure 
         if alldata(i,3) > maxthrustaltitude
             MTI = find(launchData(:,2)>maxthrustaltitude,1);
             MTAT = launchData(MTI,1);
-    
+
+            if length(launchData(MTI:end,1)) < 3
+                continue
+            end
+
             while (ag2 - ag1) > 10
                 ag1 = ag2 ;
                 Ts = launchData(MTI:end,1) - launchData(1,1);
