@@ -1,5 +1,5 @@
 clear 
-
+close all
 % Variables 
 
 % Importing data into an array 
@@ -36,14 +36,15 @@ plot(-10, 0, 'kx', 'LineWidth', lw, 'MarkerSize', ms)
 plot(-10, 0, 'gx', 'LineWidth', lw, 'MarkerSize', ms)
 plot(-10, 0, 'r-', 'LineWidth', lw, 'MarkerSize', ms)
 xlim([0 (max(data(:, 1)-data(1,1))/1000)+5])
-ylim([min(atmospalt(data(:, 2)))-10, max(atmospalt(data(:, 2)))+10])
-legend('Prelaunch', 'Launch Detected', 'Predicted Trajectory')
+ylim([min(atmospalt(data(:, 2)))-10, 600])
+legend('Prelaunch', 'Launch Detected', 'Predicted Trajectory','AutoUpdate','off')
 
 for i = 1: length(data) % Taking in data point by point - to mimic the pressure readings. 
     availabledata(i,1) = data(i,1); % Adding each time datapoint onto the end of all data array. 
     availabledata(i,2) = data(i,2); % pressure point.
     availabledata(i,3) = 44330 * ( 1 - (availabledata(i,2)/refpressure)^(1/5.255)); % calculating the altitude at each pressure point. 
     
+    delete(caption)
     % checking if the altitude is above 10m. 
 %     if availabledata(i,3) > min_triggeralt
     val = find(availabledata(:,3)>min_triggeralt); % finding out at which points the altitude is more than 10m.
@@ -86,7 +87,7 @@ for i = 1: length(data) % Taking in data point by point - to mimic the pressure 
         end
     else
         plot(availabledata(:, 1)/1000, availabledata(:, 3), 'kx', 'LineWidth', lw, 'MarkerSize', ms)
-
+        caption = text(200, 550, sprintf('Launch not detected, t = %.2f', availabledata(end, 1)/1000));
     end
 
     drawnow
