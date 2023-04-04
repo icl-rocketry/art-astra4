@@ -29,12 +29,7 @@ for i = 1: length(data) % Taking in data point by point - to mimic the pressure 
     % checking if the altitude is above 10m. 
     if alldata(i,3) > min_triggeralt
         val = find(alldata(:,3)>min_triggeralt); % finding out at which points the altitude is more than 10m.
-        for j = 1: length(val)
-            % creating a new lauch data array - for all datapoints where
-            % altitude > 10m.
-            launchData(j,1) = alldata(val(j),1); % time. 
-            launchData(j,2) = alldata(val(j),3); % altitude.
-        end
+        launchData = [launchData; alldata(val(end),1), alldata(val(end),3)];
         
         % checking if the max thrust altitude has been reached.
         % the time at which this happens is called MTAT.
