@@ -7,7 +7,7 @@ data = readmatrix("astra2_full_testdata.txt");
 alldata = []; % empty array of all data - will be filled up later on.
 launchData = []; % the first value of this array is defined as the initlaunchtime. 
 
-% check correct import of data
+% check c
 figure
 plot(data(:, 1)-data(1,1), data(:, 2))
 figure
