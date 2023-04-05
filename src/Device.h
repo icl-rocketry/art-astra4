@@ -4,9 +4,10 @@
 #include <Adafruit_NeoPixel.h>
 #include <ESP32Servo.h>
 #include "GroundStation.h"
+// #include "filesys.h"
 
-#define SERVO_PIN A3
-#define SERVO_ENABLE A2
+#define SERVO_PIN A2
+#define SERVO_ENABLE A3
 
 class Device {
 public:
@@ -24,8 +25,9 @@ public:
         pixel.begin();
         
         //544 and 2400 are the default pulse ranges from the normal arduino lib
-        myservo.attach(A3, 544, 2400);
+        myservo.attach(SERVO_PIN, 544, 2400);
         
+        pinMode(SERVO_ENABLE, OUTPUT);
         digitalWrite(SERVO_ENABLE, HIGH);
         myservo.write(90);
     }
@@ -43,6 +45,7 @@ public:
     void stop_servo() {
         digitalWrite(SERVO_ENABLE, HIGH);
         myservo.write(90);
+        delay(1000);
         digitalWrite(SERVO_ENABLE, LOW);
     }
 
