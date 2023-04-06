@@ -18,7 +18,7 @@ public:
     // Bon appetit
     template <typename T>
     void log(T item) {
-        char* buffer = static_cast<char*>(&item);
+        char* buffer = reinterpret_cast<char*>(&item);
         _log_file.write(buffer, sizeof(T));
     }
 
