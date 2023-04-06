@@ -11,16 +11,18 @@ void StateMachine::run() {
 
 State* Diagnostic::run_() {
     // TODO: Fill this out
+    delay(5000);
     return new Preflight(device);
 }
 
 State* Preflight::run_() {
-    if (!device.ground_station.connect_to_wifi()) {
-        return new Error("Couldn't connect to wifi", device);
-    }
-    device.ground_station.run();
-    device.ground_station.kill();
-    device.start_time = millis();
+    // if (!device.ground_station.connect_to_wifi()) {
+    //     return new Error("Couldn't connect to wifi", device);
+    // }
+    // device.ground_station.run();
+    // device.ground_station.kill();
+    // device.start_time = millis();
+    delay(5000);
     return new FlightPreApogee(device);
 }
 

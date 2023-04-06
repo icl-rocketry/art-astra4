@@ -3,8 +3,7 @@
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
 #include <ESP32Servo.h>
-#include "GroundStation.h"
-// #include "filesys.h"
+#include <GroundStation.h>
 
 #define SERVO_PIN A2
 #define SERVO_ENABLE A3
