@@ -39,3 +39,6 @@
 .vscode/ipch
 
 .vscode/
+
+# Apogee detection test eigen deps
+apogee_detection_test/eigen-3.4.0/*
