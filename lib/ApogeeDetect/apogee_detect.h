@@ -3,9 +3,11 @@
 #include <stdint.h>
 #include <queue>
 
-// Because I can't be asked rn, comment this out any time you want to test locally
-// #include <ArduinoEigenDense.h>
-// #include <Eigen/Dense>
+#ifdef BOARD
+#include <ArduinoEigenDense.h>
+#else
+#include <Eigen/Dense>
+#endif
 
 template <typename T, size_t LEN>
 class RingBuf;
@@ -42,7 +44,7 @@ public:
 private:
     Accumulated acc;
 
-    RingBuf<uint32_t, LEN> time_array;
+    RingBuf<float, LEN> time_array;
     RingBuf<float, LEN> altitude_array;
 
 };

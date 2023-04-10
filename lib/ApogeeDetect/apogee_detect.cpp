@@ -1,4 +1,5 @@
 #include "apogee_detect.h"
+#include <iostream>
 
 ApogeeDetect::ApogeeDetect(uint32_t time, uint16_t sample_time) : sample_time(sample_time),
                                                                  initial_entry_time(time),
@@ -6,7 +7,7 @@ ApogeeDetect::ApogeeDetect(uint32_t time, uint16_t sample_time) : sample_time(sa
 }
 
 // Function to update flight data values and return data for apogee prediction
-const ApogeeInfo &ApogeeDetect::check_apogee(uint32_t time, float alt) {
+const ApogeeInfo& ApogeeDetect::check_apogee(uint32_t time, float alt) {
     // If this is called too fast, don't do anything
     if (time - prev_check_apogee_time <= sample_time) {
         return apogee_info;
@@ -14,7 +15,7 @@ const ApogeeInfo &ApogeeDetect::check_apogee(uint32_t time, float alt) {
 
     uint32_t time_since_entry = time - initial_entry_time;
 
-    buf.push(time_since_entry, alt);
+    buf.push(static_cast<float>(time_since_entry) / 1000, alt);
 
     // Apogee detection:
     if (!(apogee_info.reached)) {
@@ -49,6 +50,13 @@ void ApogeeDetect::quadraticFit() {
 
     // solve the system for the coefficents
     coeffs = A.colPivHouseholderQr().solve(b);
+
+    // std::cout << "A" << std::endl;
+    // std::cout << A << std::endl;
+    // std::cout << "b" << std::endl;
+    // std::cout << b << std::endl;
+    // std::cout << "coeffs" << std::endl;
+    // std::cout << coeffs << std::endl;
 }
 
 
