@@ -5,7 +5,7 @@
 
 struct ApogeeInfo {
     bool reached;
-    float altitude;
+    float alt;
     uint32_t time;  // time in ms
 };
 
@@ -14,9 +14,9 @@ class ApogeeDetect {
     /**
      * @brief Construct a new Apogee Detect object
      *
-     * @param sampleTime  in millis
+     * @param sample_time  in millis
      */
-    ApogeeDetect(uint32_t time, uint16_t sampleTime);
+    ApogeeDetect(uint32_t time, uint16_t sample_time);
     /**
      * @brief
      *
@@ -24,13 +24,13 @@ class ApogeeDetect {
      * @param alt expects up + be careful!
      * @return const ApogeeInfo&
      */
-    const ApogeeInfo& checkApogee(uint32_t time, float altitude);
+    const ApogeeInfo& check_apogee(uint32_t time, float alt);
 
    private:
     static constexpr int arrayLen = 100;
     AccumulatingRingBuffer<arrayLen> buf;
 
-    const uint16_t _sampleTime;
+    const uint16_t sample_time;
     uint32_t prev_check_apogee_time = 0;
     uint32_t initial_entry_time = 0;
 
@@ -43,5 +43,5 @@ class ApogeeDetect {
     static constexpr float alt_threshold = 0;  // threshold to detect altitude descent
     static constexpr float alt_min = 100;      // Minimum altitude (m) before apogee detection algorithm works
 
-    ApogeeInfo _apogeeinfo;  // create the structure for ApogeeInfo
+    ApogeeInfo apogee_info;  // create the structure for ApogeeInfo
 };
