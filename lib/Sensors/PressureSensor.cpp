@@ -39,5 +39,5 @@ float PressureSensor::get_pressure() const {
 }
 
 float PressureSensor::get_temperature() const {
-    return _temperature_event.temperature;
+    return _temperature_event.temperature * 1.8 + 32;
 }
