@@ -3,7 +3,7 @@
 
 ApogeePredictor::ApogeePredictor(uint32_t initial_entry_time) : initial_entry_time(initial_entry_time) {}
 
-float ApogeePredictor::feed(uint32_t time, float alt) {
+float ApogeePredictor::predict(uint32_t time, float alt) {
     uint32_t time_since_entry = time - initial_entry_time;
 
     buf.push(static_cast<float>(time_since_entry) / 1000, alt);
@@ -41,13 +41,13 @@ bool ApogeeDetector::detect(uint32_t time, float alt) {
     }
     prev_check_apogee_time = time;
 
-    float apogee = predictor.feed(time, alt);
+    float apogee = predictor.predict(time, alt);
 
     #ifdef DEBUG
         std::cout << "Apogee: "        << apogee 
                   << ", Prev_Apogee: " << prev_apogee
                   << ", >AltMin: "     << (apogee > alt_min)
-                  << ", diff: "          << abs(apogee - prev_apogee)
+                  << ", diff: "        << abs(apogee - prev_apogee)
                   << ", Time: "        << predictor.get_apogee_time()
                   << std::endl;
     #endif

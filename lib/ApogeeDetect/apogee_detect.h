@@ -111,7 +111,7 @@ public:
      * @param altitude in meters
      * @returns predicted apogee altitude
     */
-    float feed(uint32_t time, float alt);
+    float predict(uint32_t time, float alt);
 
     /**
      * @brief Get the absolute time of apogee
