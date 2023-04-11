@@ -36,7 +36,7 @@ bool ApogeeDetector::detect(uint32_t time, float pressure) {
     }
 
     // If this is called too fast, don't do anything
-    if (time - prev_check_apogee_time <= sample_time) {
+    if (time - prev_check_apogee_time <= min_sample_time) {
         return false;
     }
     prev_check_apogee_time = time;

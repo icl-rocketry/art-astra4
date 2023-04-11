@@ -154,7 +154,7 @@ private:
 
     ApogeePredictor predictor;
     uint32_t prev_check_apogee_time = 0;
-    const uint16_t sample_time;
+    const uint16_t min_sample_time;
 
     float prev_apogee;
 
