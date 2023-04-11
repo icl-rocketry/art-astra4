@@ -35,7 +35,7 @@ void PressureSensor::read() {
 }
 
 float PressureSensor::get_pressure() const {
-    return _pressure_event.pressure;
+    return _pressure_event.pressure * 100; // Convert from hPa to Pa
 }
 
 float PressureSensor::get_temperature() const {
