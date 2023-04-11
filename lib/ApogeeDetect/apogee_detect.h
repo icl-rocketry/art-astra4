@@ -7,6 +7,10 @@
 #include <ArduinoEigenDense.h>
 #else
 #include <Eigen/Dense>
+
+#ifdef DEBUG
+#include <iostream>
+#endif
 #endif
 
 template <typename T, size_t LEN>
@@ -90,45 +94,69 @@ private:
     static constexpr size_t maxLen = LEN;
 };
 
-struct ApogeeInfo {
-    bool reached;
-    float alt;
-    uint32_t time;  // time in ms
-};
-
-class ApogeeDetect {
-   public:
+/**
+ * @brief Predicts apogee given sampled times and pressures
+ * @remark This class should give multiple predictions over time
+*/
+class ApogeePredictor {
+public:
     /**
-     * @brief Construct a new Apogee Detect object
-     *
-     * @param sample_time  in millis
-     */
-    ApogeeDetect(uint32_t time, uint16_t sample_time);
-    /**
-     * @brief
-     *
-     * @param time
-     * @param alt expects up + be careful!
-     * @return const ApogeeInfo&
-     */
-    const ApogeeInfo& check_apogee(uint32_t time, float alt);
+     * @param initial_entry_time in millis
+    */
+    ApogeePredictor(uint32_t initial_entry_time);
 
-   private:
+    /**
+     * @brief Feed a time and altitude reading into the predictor
+     * @param time in millis
+     * @param altitude in meters
+     * @returns predicted apogee altitude
+    */
+    float feed(uint32_t time, float alt);
+
+    /**
+     * @brief Get the absolute time of apogee
+     * @returns the absolute time of apogee
+    */
+    uint32_t get_apogee_time() const;
+
+private:
     static constexpr int arrayLen = 100;
     AccumulatingRingBuffer<arrayLen> buf;
-
-    const uint16_t sample_time;
-    uint32_t prev_check_apogee_time = 0;
-    uint32_t initial_entry_time = 0;
-
-    void quadraticFit();
 
     Eigen::Matrix3f A;
     Eigen::Vector3f b;
     Eigen::Vector3f coeffs;
 
-    static constexpr float alt_threshold = 0;  // threshold to detect altitude descent
-    static constexpr float alt_min = 100;      // Minimum altitude (m) before apogee detection algorithm works
+    const uint32_t initial_entry_time; // time in millis that this was entered
+};
 
-    ApogeeInfo apogee_info;  // create the structure for ApogeeInfo
+class ApogeeDetector {
+   public:
+    /**
+     * @brief Construct a new Apogee Detector object
+     *
+     * @param sample_time  in millis
+     */
+    ApogeeDetector(uint32_t initial_entry_time, uint16_t sample_time);
+    /**
+     * @brief
+     * @remark Should only be called until apogee has been reached
+     * @param time
+     * @param alt expects up + be careful!
+     * @return whether apogee has been reached
+     */
+    bool detect(uint32_t time, float alt);
+
+   private:
+    ApogeePredictor predictor;
+    uint32_t prev_check_apogee_time = 0;
+    const uint16_t sample_time;
+
+    float prev_apogee;
+
+    static constexpr float alt_threshold = 10;  // threshold to detect altitude descent
+    static constexpr float alt_min = 10;      // Minimum altitude (m) before apogee detection algorithm works
+    
+    bool apogee_found;
+    uint32_t apogee_time;
 };

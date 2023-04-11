@@ -1,6 +1,5 @@
 #include <iostream>
 #include <fstream>
-#include <Eigen/Dense>
 #include <vector>
 #include <exception>
 #include "../lib/ApogeeDetect/apogee_detect.h"
@@ -34,7 +33,7 @@ int main(int argc, char **argv) {
 
     data.close();
 
-    ApogeeDetect detector(times.at(0), 20);
+    ApogeeDetector detector(times.at(0), 20);
 
     uint32_t time;
     float pressure;
@@ -44,10 +43,11 @@ int main(int argc, char **argv) {
 
         time = times[i];
         pressure = pressures[i];
+        float alt = pressure_to_altitude(pressure);
 
-        const auto& info = detector.check_apogee(time, pressure_to_altitude(pressure));
+        bool reached = detector.detect(time, alt);
 
-        std::cout << info.alt << "," << info.reached << "," << info.time << std::endl;
+        std::cout << reached << ", " << alt << ", " << time << std::endl;
     }
 
     return 0;

@@ -1,44 +1,13 @@
 #include "apogee_detect.h"
 #include <iostream>
 
-ApogeeDetect::ApogeeDetect(uint32_t time, uint16_t sample_time) : sample_time(sample_time),
-                                                                 initial_entry_time(time),
-                                                                 apogee_info({false, 0, 0}) {
-}
+ApogeePredictor::ApogeePredictor(uint32_t initial_entry_time) : initial_entry_time(initial_entry_time) {}
 
-// Function to update flight data values and return data for apogee prediction
-const ApogeeInfo& ApogeeDetect::check_apogee(uint32_t time, float alt) {
-    // If this is called too fast, don't do anything
-    if (time - prev_check_apogee_time <= sample_time) {
-        return apogee_info;
-    }
-
+float ApogeePredictor::feed(uint32_t time, float alt) {
     uint32_t time_since_entry = time - initial_entry_time;
 
     buf.push(static_cast<float>(time_since_entry) / 1000, alt);
 
-    // Apogee detection:
-    if (!(apogee_info.reached)) {
-        // Fit a quadratic to the data
-        quadraticFit();
-
-        apogee_info.time = (-coeffs(1) / (2 * coeffs(2))) + initial_entry_time;  // maximum from polyinomial using derivative
-
-        if ((time >= apogee_info.time) && (coeffs(2) < 0) && (time > 0) && (alt > alt_min)) {
-            apogee_info.alt = coeffs(0) - (std::pow(coeffs(1), 2) / (4 * coeffs(2)));
-            
-            if ((alt - apogee_info.alt) < alt_threshold) { // if we have passed apogee and now descending, could put a bound on here too
-                apogee_info.reached = true;
-            }
-        }
-    }
-    prev_check_apogee_time = time;
-    
-    return apogee_info;
-};
-
-/*Create a matrix, three simultaneous equations */
-void ApogeeDetect::quadraticFit() {
     const Accumulated& acc = buf.get_accumulated();
     
     // re populate the arrays
@@ -51,14 +20,48 @@ void ApogeeDetect::quadraticFit() {
     // solve the system for the coefficents
     coeffs = A.colPivHouseholderQr().solve(b);
 
-    // std::cout << "A" << std::endl;
-    // std::cout << A << std::endl;
-    // std::cout << "b" << std::endl;
-    // std::cout << b << std::endl;
-    // std::cout << "coeffs" << std::endl;
-    // std::cout << coeffs << std::endl;
+    return coeffs(0) - (std::pow(coeffs(1), 2) / (4 * coeffs(2))); // c - b^2/4a (aka the highest point)
 }
 
+uint32_t ApogeePredictor::get_apogee_time() const {
+    float relative_apogee_time = 1000 * (-coeffs(1) / (2 * coeffs(2)));
+    return static_cast<uint32_t>(relative_apogee_time) + initial_entry_time;  // maximum from polyinomial using derivative
+}
+
+ApogeeDetector::ApogeeDetector(uint32_t initial_entry_time, uint16_t sample_time) : sample_time(sample_time), predictor(initial_entry_time) {}
+
+bool ApogeeDetector::detect(uint32_t time, float alt) {
+    if (apogee_found) {
+        return time >= apogee_time;
+    }
+
+    // If this is called too fast, don't do anything
+    if (time - prev_check_apogee_time <= sample_time) {
+        return false;
+    }
+    prev_check_apogee_time = time;
+
+    float apogee = predictor.feed(time, alt);
+
+    #ifdef DEBUG
+        std::cout << "Apogee: "        << apogee 
+                  << ", Prev_Apogee: " << prev_apogee
+                  << ", >AltMin: "     << (apogee > alt_min)
+                  << ", diff: "          << abs(apogee - prev_apogee)
+                  << ", Time: "        << predictor.get_apogee_time()
+                  << std::endl;
+    #endif
+    
+    // We've found apogee iff we're above alt_min meters and our apogee guesses have converged 
+    apogee_found = apogee > alt_min && abs(apogee - prev_apogee) < alt_threshold;
+    prev_apogee = apogee;
+
+    if (apogee_found) {
+        apogee_time = predictor.get_apogee_time();
+    }
+    
+    return apogee_found && time >= apogee_time;
+};
 
 template <size_t LEN>
 AccumulatingRingBuffer<LEN>::AccumulatingRingBuffer() : acc{0, 0, 0, 0, 0, 0, 0, 0} {}
