@@ -131,7 +131,7 @@ private:
 };
 
 class ApogeeDetector {
-   public:
+public:
     /**
      * @brief Construct a new Apogee Detector object
      *
@@ -142,12 +142,16 @@ class ApogeeDetector {
      * @brief
      * @remark Should only be called until apogee has been reached
      * @param time
-     * @param alt expects up + be careful!
+     * @param pressure
      * @return whether apogee has been reached
      */
-    bool detect(uint32_t time, float alt);
+    bool detect(uint32_t time, float pressure);
 
-   private:
+private:
+    static float pressure_to_altitude(const float pressure) {
+        return 44330 * (1 - std::pow(pressure/101728.25, 1/5.255));
+    }
+
     ApogeePredictor predictor;
     uint32_t prev_check_apogee_time = 0;
     const uint16_t sample_time;

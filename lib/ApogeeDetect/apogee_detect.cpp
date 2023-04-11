@@ -30,7 +30,7 @@ uint32_t ApogeePredictor::get_apogee_time() const {
 
 ApogeeDetector::ApogeeDetector(uint32_t initial_entry_time, uint16_t sample_time) : sample_time(sample_time), predictor(initial_entry_time) {}
 
-bool ApogeeDetector::detect(uint32_t time, float alt) {
+bool ApogeeDetector::detect(uint32_t time, float pressure) {
     if (apogee_found) {
         return time >= apogee_time;
     }
@@ -41,7 +41,7 @@ bool ApogeeDetector::detect(uint32_t time, float alt) {
     }
     prev_check_apogee_time = time;
 
-    float apogee = predictor.predict(time, alt);
+    float apogee = predictor.predict(time, pressure_to_altitude(pressure));
 
     #ifdef DEBUG
         std::cout << "Apogee: "        << apogee 

@@ -3,12 +3,6 @@
 #include <vector>
 #include <exception>
 #include "../lib/ApogeeDetect/apogee_detect.h"
-
-const float refpressure = 101728.25;
-
-float pressure_to_altitude(const float pressure) {
-    return 44330 * (1 - std::pow(pressure/refpressure, 1/5.255));
-}
  
 int main(int argc, char **argv) {
     if (argc < 2) {
@@ -43,11 +37,10 @@ int main(int argc, char **argv) {
 
         time = times[i];
         pressure = pressures[i];
-        float alt = pressure_to_altitude(pressure);
 
-        bool reached = detector.detect(time, alt);
+        bool reached = detector.detect(time, pressure);
 
-        std::cout << reached << ", " << alt << ", " << time << std::endl;
+        std::cout << reached << ", " << pressure << ", " << time << std::endl;
     }
 
     return 0;
