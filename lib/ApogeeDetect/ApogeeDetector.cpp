@@ -1,4 +1,4 @@
-#include "apogee_detect.h"
+#include "ApogeeDetector.h"
 #include <iostream>
 
 ApogeePredictor::ApogeePredictor(uint32_t initial_entry_time) : initial_entry_time(initial_entry_time) {}
@@ -28,7 +28,7 @@ uint32_t ApogeePredictor::get_apogee_time() const {
     return static_cast<uint32_t>(relative_apogee_time) + initial_entry_time;  // maximum from polyinomial using derivative
 }
 
-ApogeeDetector::ApogeeDetector(uint32_t initial_entry_time, uint16_t sample_time) : sample_time(sample_time), predictor(initial_entry_time) {}
+ApogeeDetector::ApogeeDetector(uint32_t initial_entry_time, uint16_t min_sample_time) : min_sample_time(min_sample_time), predictor(initial_entry_time) {}
 
 bool ApogeeDetector::detect(uint32_t time, float pressure) {
     if (apogee_found) {

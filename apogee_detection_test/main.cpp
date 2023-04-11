@@ -2,7 +2,7 @@
 #include <fstream>
 #include <vector>
 #include <exception>
-#include "../lib/ApogeeDetect/apogee_detect.h"
+#include "../lib/ApogeeDetect/ApogeeDetector.h"
  
 int main(int argc, char **argv) {
     if (argc < 2) {

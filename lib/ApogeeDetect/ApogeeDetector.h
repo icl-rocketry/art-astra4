@@ -135,9 +135,9 @@ public:
     /**
      * @brief Construct a new Apogee Detector object
      *
-     * @param sample_time  in millis
+     * @param min_sample_time the minimum time between samples in millis
      */
-    ApogeeDetector(uint32_t initial_entry_time, uint16_t sample_time);
+    ApogeeDetector(uint32_t initial_entry_time, uint16_t min_sample_time);
     /**
      * @brief
      * @remark Should only be called until apogee has been reached
