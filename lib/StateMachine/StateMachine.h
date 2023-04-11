@@ -84,11 +84,11 @@ private:
 
 class StateMachine {
 public:
-    StateMachine(State* initial) : state(initial) {}
+    StateMachine(Device& device, State* initial) : device(device), state(initial) {}
 
     void run();
 
 private:
-    Device device;
+    Device& device;
     State* state;
 };
