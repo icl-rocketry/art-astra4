@@ -12,13 +12,11 @@
 class Device {
 public:
     Device() : pixel(1, PIN_NEOPIXEL, NEO_GRB + NEO_KHZ800) {
-
         // No idea why I'm doing this but that's what the examples for the ESP32 servo library want
         ESP32PWM::allocateTimer(0);
         ESP32PWM::allocateTimer(1);
         ESP32PWM::allocateTimer(2);
         ESP32PWM::allocateTimer(3);
-
 
         pixel.begin();
         
@@ -64,7 +62,6 @@ public:
         return ground_station;
     }
 
-    uint32_t start_time;
     USBCDC serial;
     
 private:

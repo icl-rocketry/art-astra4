@@ -1,4 +1,5 @@
 #include "StateMachine.h"
+#include <ApogeeDetector.h>
 
 void StateMachine::run() {
     while (true) {
@@ -10,24 +11,35 @@ void StateMachine::run() {
 }
 
 State* Diagnostic::run_() {
-    // TODO: Fill this out
-    delay(5000);
+    if (!device.healthy()) {
+        return new Error("DPS310 initialisation failed", device);
+    }
     return new Preflight(device);
 }
 
 State* Preflight::run_() {
-    // if (!device.ground_station.connect_to_wifi()) {
-    //     return new Error("Couldn't connect to wifi", device);
-    // }
-    // device.ground_station.run();
-    // device.ground_station.kill();
-    // device.start_time = millis();
-    delay(5000);
+    auto& ground_station = device.get_ground_station();
+    
+    if (!ground_station.connect_to_wifi()) {
+        return new Error("Couldn't connect to wifi", device);
+    }
+    
+    ground_station.run();
+    
     return new FlightPreApogee(device);
 }
 
 State* FlightPreApogee::run_() {
-    // TODO: Fill this out
+    ApogeeDetector detector(millis(), 20);
+    PressureSensor& sensor = device.get_pressure_sensor();
+
+    bool done = false;
+
+    while (!done) {
+        sensor.read();
+        done = detector.detect(millis(), sensor.get_pressure());
+    }
+
     return new Separation(device);
 }
 
