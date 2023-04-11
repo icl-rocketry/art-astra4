@@ -6,7 +6,7 @@
 
 class Logger {
 public:
-    Logger(File32 log_file) : _log_file(log_file) {}
+    Logger(File32& log_file) : _log_file(log_file) {}
 
 
     void log_line(String item) {
@@ -29,5 +29,5 @@ public:
     }
 
 private:
-    File32 _log_file;
+    File32& _log_file;
 };

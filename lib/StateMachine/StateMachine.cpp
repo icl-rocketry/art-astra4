@@ -1,19 +1,30 @@
 #include "StateMachine.h"
 #include <ApogeeDetector.h>
 
+#define DATA_LOG_FILE "/data.bin"
+
 void StateMachine::run() {
     while (true) {
         State* new_state = state->run();
-        if (new_state == nullptr) return;
+        if (new_state == nullptr) break;
         delete state; // Manual memory management (my favourite)
         state = new_state;
+    }
+    while (true) {
+        delay(10000);
     }
 }
 
 State* Diagnostic::run_() {
-    if (!device.healthy()) {
+    auto& dps = device.get_pressure_sensor();
+    if (!dps.healthy()) {
         return new Error("DPS310 initialisation failed", device);
     }
+
+    if (filesys::exists(DATA_LOG_FILE)) {
+        return new Error("Data log file exists", device);
+    }
+
     return new Preflight(device);
 }
 
@@ -33,13 +44,25 @@ State* FlightPreApogee::run_() {
     ApogeeDetector detector(millis(), 20);
     PressureSensor& sensor = device.get_pressure_sensor();
 
+    File32 data_file = filesys::open(DATA_LOG_FILE, filesys::WRITEONLY);
+    Logger data_logger(data_file);
+
     bool done = false;
+
+    uint32_t time;
+    float pressure;
 
     while (!done) {
         sensor.read();
-        done = detector.detect(millis(), sensor.get_pressure());
+        time = millis();
+        pressure = sensor.get_pressure();
+        done = detector.detect(time, pressure);
+        data_logger.log(time, pressure);
     }
 
+    data_file.close();
+
+    device.sys_log("Apogee detected @ ", std::to_string(pressure), "Pa");
     return new Separation(device);
 }
 
@@ -54,17 +77,10 @@ State* Separation::run_() {
 
 // Don't do anything
 State* PostFlight::run_() {
-    while (true) {
-        delay(10000);
-    }
     return nullptr;
 }
 
 State* Error::run_() {
-    //TODO: add logger to log the error
-    while (true) {
-        device.serial.println("TODO");
-        delay(1000);
-    }
+    device.sys_log(msg);
     return nullptr;
 }

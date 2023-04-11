@@ -56,10 +56,10 @@ File32 open(const String& filename, FileMode mode) {
         mode_ = O_READ;
         break;
     case FileMode::WRITEONLY:
-        mode_ = O_WRITE;
+        mode_ = O_WRITE | O_CREAT;
         break;
     case FileMode::APPENDONLY:
-        mode_ = O_APPEND;
+        mode_ = O_WRITE | O_APPEND | O_CREAT;
         break;
     }
     return fatfs.open(filename, mode_);

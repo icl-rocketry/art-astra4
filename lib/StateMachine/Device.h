@@ -4,7 +4,10 @@
 #include <Adafruit_NeoPixel.h>
 #include <ESP32Servo.h>
 #include <GroundStation.h>
+
 #include <PressureSensor.h>
+#include <filesys.h>
+#include <Logger.h>
 
 #define SERVO_PIN A2
 #define SERVO_ENABLE A3
@@ -26,10 +29,9 @@ public:
         pinMode(SERVO_ENABLE, OUTPUT);
         digitalWrite(SERVO_ENABLE, HIGH);
         myservo.write(90);
-    }
 
-    bool healthy() {
-        return dps.healthy();
+        // Start up filesystem
+        filesys::init();
     }
 
     void showColour(uint32_t colour) {
@@ -52,6 +54,16 @@ public:
     void start_servo_backward() {
         digitalWrite(SERVO_ENABLE, HIGH);
         myservo.write(135);
+    }
+
+    template <typename ...T>
+    void sys_log(T... args) {
+        auto log_file = filesys::open("/log.txt", filesys::APPENDONLY);
+        Logger logger(log_file);
+
+        logger.log(std::to_string(millis()), args...);
+
+        log_file.close();
     }
 
     PressureSensor& get_pressure_sensor() {
