@@ -22,6 +22,10 @@ public:
         _log_file.write(buffer, sizeof(T));
     }
 
+    void log(String item) {
+        _log_file.write(item.c_str());
+    }
+
     template <typename First, typename Second, typename... Rest>
     void log(First f, Second s, Rest... rest) {
         log(f);

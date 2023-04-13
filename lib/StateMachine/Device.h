@@ -61,7 +61,7 @@ public:
         auto log_file = filesys::open("/log.txt", filesys::APPENDONLY);
         Logger logger(log_file);
 
-        logger.log(std::to_string(millis()), args...);
+        logger.log(String(millis()), args...);
 
         log_file.close();
     }
