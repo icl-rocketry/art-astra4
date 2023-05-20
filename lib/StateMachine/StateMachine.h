@@ -71,13 +71,13 @@ protected:
 
 class Error : public State {
 public:
-    Error(const std::string msg, Device& device) : State(device, RED), msg(msg) {}
+    Error(const String msg, Device& device) : State(device, RED), msg(msg) {}
 
 protected:
     State* run_();
 
 private:
-    std::string msg;
+    String msg;
 };
 
 

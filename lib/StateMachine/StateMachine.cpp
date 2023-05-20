@@ -62,7 +62,7 @@ State* FlightPreApogee::run_() {
 
     data_file.close();
 
-    device.sys_log("Apogee detected @ ", std::to_string(pressure), "Pa");
+    device.sys_log(String("Apogee detected @ "), String(pressure), String("Pa"));
     return new Separation(device);
 }
 
