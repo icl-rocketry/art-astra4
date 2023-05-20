@@ -1,11 +1,12 @@
-// #include <Arduino.h>
+#include <Arduino.h>
+#include <Device.h>
+#include <StateMachine.h>
 
-// void setup() {
-//   Serial.begin(9600);
-//   Serial.println("Hello from setup");
-// }
+Device device;
+StateMachine sm(device, new Diagnostic(device));
 
-// void loop() {
-//   Serial.println("Hello from loop");
-//   delay(1000); 
-// }
+void setup() {}
+
+void loop() {
+  sm.run();
+}
