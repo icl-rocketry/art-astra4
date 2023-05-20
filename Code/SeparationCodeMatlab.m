@@ -6,7 +6,7 @@ cols = ["#FAC05E", "#59CD90", "#EE6352", "#3FA7D6"];
 % Variables 
 
 % Importing data into an array 
-data = readmatrix("astra2_full_testdata.txt");
+data = readmatrix("astra2_noisy.txt");
 availabledata = []; % empty array of all data - will be filled up later on.
 launchData = []; % the first value of this array is defined as the initlaunchtime. 
 
@@ -50,11 +50,13 @@ legend('Prelaunch', 'Actual Trajectory', 'Current Predicted Trajectory', ...
     'Predicted Trajectory at Separation Trigger','AutoUpdate','off', 'FontSize', fs)
 caption = text(200, 550, sprintf('Launch not detected, t = 0'));
 
-v = VideoWriter('apogee_fit_astra2.mp4','MPEG-4');
-v.FrameRate = fr;
-v.Quality = 98;
+% v = VideoWriter('apogee_fit_astra2.mp4','MPEG-4');
+% v.FrameRate = fr;
+% v.Quality = 98;
+% 
+% open(v);
 
-open(v);
+tol = 0.25;
 
 for i = 5000:6000 % Taking in data point by point - to mimic the pressure readings. 
     availabledata(i,1) = data(i,1); % Adding each time datapoint onto the end of all data array. 
@@ -77,7 +79,7 @@ for i = 5000:6000 % Taking in data point by point - to mimic the pressure readin
 
             if length(launchData(MTI:end,1)) < 3
                 drawnow
-                writeVideo(v, getframe(af));
+%                 writeVideo(v, getframe(af));
                 continue
             end
 
@@ -104,7 +106,7 @@ for i = 5000:6000 % Taking in data point by point - to mimic the pressure readin
             end
             trajpred = plot((anim_xs + launchData(1,1))/1000, anim_ys, '-', 'LineWidth', lw, 'MarkerSize', ms, 'Color', cols(3));
 %             predap = text(300, 300, sprintf('Current Apogee prediction %.1f m at t = %.2f', ag2, tguess/1000), 'FontSize', fs);
-            if As(end) ~= As(end-1)
+            if As(end) - As(end-1) > tol
                 if ag2 - ag1 < 1 && launchData(end, 2) <= ag2 && launchData(end, 1) > tguess
                     vel = velcoeffs(1)*Ts(end) + velcoeffs(2);
                     fprintf('Apogee detected at t = %.1f, alt = %.1f, v = %.2f\n', Ts(end)/1000, ag2, vel)                
@@ -127,10 +129,10 @@ for i = 5000:6000 % Taking in data point by point - to mimic the pressure readin
     end
 
     drawnow
-    writeVideo(v, getframe(af));
+%     writeVideo(v, getframe(af));
 end
 
-close(v)
+% close(v)
 
 
 function ys = coeffplot(xs, coeffs)
