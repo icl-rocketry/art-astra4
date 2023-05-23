@@ -49,6 +49,7 @@ void GroundStation::run() {
         server_.handleClient();
         delay(2);
     }
+    kill();
 }
 
 void GroundStation::kill() {

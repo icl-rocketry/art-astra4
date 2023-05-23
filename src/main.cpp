@@ -1,12 +1,11 @@
 #include <Arduino.h>
-#include <Device.h>
 #include <StateMachine.h>
-
-Device device;
-StateMachine sm(device, new Diagnostic(device));
 
 void setup() {}
 
 void loop() {
-  sm.run();
+    Device device; // This is here because the constructor actually runs code
+    StateMachine sm(device, new Diagnostic(device));
+
+    sm.run();
 }

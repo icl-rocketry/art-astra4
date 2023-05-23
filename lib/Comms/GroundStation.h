@@ -12,10 +12,10 @@ public:
 
     bool connect_to_wifi();
     void run();
-    void kill();
 
 private:
     bool done;
 
+    void kill();
     WebServer server_;
 };
