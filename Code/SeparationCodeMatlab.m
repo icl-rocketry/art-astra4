@@ -50,11 +50,11 @@ legend('Prelaunch', 'Actual Trajectory', 'Current Predicted Trajectory', ...
     'Predicted Trajectory at Separation Trigger','AutoUpdate','off', 'FontSize', fs)
 caption = text(200, 550, sprintf('Launch not detected, t = 0'));
 
-v = VideoWriter('apogee_fit_astra2.mp4','MPEG-4');
-v.FrameRate = fr;
-v.Quality = 98;
-
-open(v);
+% v = VideoWriter('apogee_fit_astra2.mp4','MPEG-4');
+% v.FrameRate = fr;
+% v.Quality = 98;
+% 
+% open(v);
 
 for i = 5000:6000 % Taking in data point by point - to mimic the pressure readings. 
     availabledata(i,1) = data(i,1); % Adding each time datapoint onto the end of all data array. 
@@ -77,7 +77,7 @@ for i = 5000:6000 % Taking in data point by point - to mimic the pressure readin
 
             if length(launchData(MTI:end,1)) < 3
                 drawnow
-                writeVideo(v, getframe(af));
+%                 writeVideo(v, getframe(af));
                 continue
             end
 
@@ -127,10 +127,10 @@ for i = 5000:6000 % Taking in data point by point - to mimic the pressure readin
     end
 
     drawnow
-    writeVideo(v, getframe(af));
+%     writeVideo(v, getframe(af));
 end
 
-close(v)
+% close(v)
 
 
 function ys = coeffplot(xs, coeffs)
@@ -140,21 +140,3 @@ function ys = coeffplot(xs, coeffs)
     ys = ys + coeffs(1).*(xs.^2) + coeffs(2).*xs + coeffs(3);
 
 end
-
-    
-
-
-
-    
-
-    
-
-
-
-
-
-
-
-%%
-
-% Functions.
