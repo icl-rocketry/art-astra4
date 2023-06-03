@@ -16,7 +16,6 @@ launchData = []; % the first value of this array is defined as the initlaunchtim
 % figure
 % plot(data(:, 1)-data(1,1), atmospalt(data(:, 2)))
 
-
 % Variables
 refpressure = 101728.25;
 maxthrustaltitude = 220;
@@ -50,11 +49,11 @@ legend('Prelaunch', 'Actual Trajectory', 'Current Predicted Trajectory', ...
     'Predicted Trajectory at Separation Trigger','AutoUpdate','off', 'FontSize', fs)
 caption = text(200, 550, sprintf('Launch not detected, t = 0'));
 
-v = VideoWriter('apogee_fit_astra2.mp4','MPEG-4');
-v.FrameRate = fr;
-v.Quality = 98;
+% v = VideoWriter('apogee_fit_astra2.mp4','MPEG-4');
+% v.FrameRate = fr;
+% v.Quality = 98;
 
-open(v);
+% open(v);
 
 for i = 5000:6000 % Taking in data point by point - to mimic the pressure readings. 
     availabledata(i,1) = data(i,1); % Adding each time datapoint onto the end of all data array. 
@@ -63,7 +62,7 @@ for i = 5000:6000 % Taking in data point by point - to mimic the pressure readin
     
     delete(caption)
     % checking if the altitude is above 10m. 
-%     if availabledata(i,3) > min_triggeralt
+    % if availabledata(i,3) > min_triggeralt
     val = find(availabledata(:,3)>min_triggeralt); % finding out at which points the altitude is more than 10m.
     if ~isempty(val)
         launchData = [launchData; availabledata(val(end),1), availabledata(val(end),3)];
@@ -75,19 +74,19 @@ for i = 5000:6000 % Taking in data point by point - to mimic the pressure readin
             MTI = find(launchData(:,2)>maxthrustaltitude,1);
             MTAT = launchData(MTI,1);
 
-            if length(launchData(MTI:end,1)) < 3
-                drawnow
-                writeVideo(v, getframe(af));
-                continue
-            end
-
+           if length(launchData(MTI:end,1)) < 3
+               drawnow
+%                writeVideo(v, getframe(af));
+               continue
+           end
 
             Ts = launchData(MTI:end,1) - launchData(1,1);
             As = launchData(MTI:end,2);
-               
+            
+            % Try to get this section to update, rather than rewriting it. 
             y = ([sum(Ts.^4), sum(Ts.^3), sum(Ts.^2); sum(Ts.^3), sum(Ts.^2), sum(Ts.^1); sum(Ts.^2), sum(Ts), length(Ts)]);
             z = [sum(As.*(Ts.^2)); sum(As.*(Ts.^1)); sum(As)];                
-            coeffs = y\z;
+            coeffs = y\z; % shouldnt be singular. 
             velcoeffs = [2*coeffs(1); coeffs(2)];
             
             
@@ -127,10 +126,10 @@ for i = 5000:6000 % Taking in data point by point - to mimic the pressure readin
     end
 
     drawnow
-    writeVideo(v, getframe(af));
+    % writeVideo(v, getframe(af));
 end
 
-close(v)
+% close(v)
 
 
 function ys = coeffplot(xs, coeffs)
