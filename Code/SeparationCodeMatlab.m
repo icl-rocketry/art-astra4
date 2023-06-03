@@ -89,7 +89,7 @@ for i = 5000:6000 % Taking in data point by point - to mimic the pressure readin
             coeffs = y\z; % shouldnt be singular. 
             velcoeffs = [2*coeffs(1); coeffs(2)];
             
-            
+      
             ag1 = ag2;
             tguess = -velcoeffs(2)/velcoeffs(1);
             ag2 = coeffs(1)*tguess^2 + coeffs(2)*tguess + coeffs(3);
