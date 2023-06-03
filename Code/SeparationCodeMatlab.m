@@ -74,11 +74,11 @@ for i = 5000:6000 % Taking in data point by point - to mimic the pressure readin
             MTI = find(launchData(:,2)>maxthrustaltitude,1);
             MTAT = launchData(MTI,1);
 
-           if length(launchData(MTI:end,1)) < 3
-               drawnow
-%                writeVideo(v, getframe(af));
-               continue
-           end
+            if length(launchData(MTI:end,1)) < 3
+                drawnow
+                writeVideo(v, getframe(af));
+                continue
+            end
 
             Ts = launchData(MTI:end,1) - launchData(1,1);
             As = launchData(MTI:end,2);
@@ -126,7 +126,7 @@ for i = 5000:6000 % Taking in data point by point - to mimic the pressure readin
     end
 
     drawnow
-    % writeVideo(v, getframe(af));
+    writeVideo(v, getframe(af));
 end
 
 % close(v)
@@ -139,21 +139,3 @@ function ys = coeffplot(xs, coeffs)
     ys = ys + coeffs(1).*(xs.^2) + coeffs(2).*xs + coeffs(3);
 
 end
-
-    
-
-
-
-    
-
-    
-
-
-
-
-
-
-
-%%
-
-% Functions.
