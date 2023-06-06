@@ -1,10 +1,14 @@
+#include <dummy.h>
+
+#include <dummy.h>
+
 void setup() {
   Serial.begin(9600);
 }
 
 void loop() {
-  int t = 2;
-  int n = 1;
+  int t = 3000;
+  int n = 2;
   while (n < 100) {
     float x[n];
     float noise[n];
@@ -81,5 +85,7 @@ void plot(float x[], float y[], int n) {
     Serial.print(x[i]);
     Serial.print(",");
     Serial.print(y[i]);
-    Serial.print("o");
-    Serial.print(" ");
+    //Serial.print("o");
+    //Serial.print("h");
+  }
+}
